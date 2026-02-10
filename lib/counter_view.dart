@@ -40,8 +40,44 @@ class _CounterViewState extends State<CounterView> {
                         setState(() => _controller.incrementCounter()),
                     icon: const Icon(Icons.arrow_forward_rounded)),
                 IconButton(
-                    onPressed: () => setState(() => _controller.resetCounter()),
-                    icon: const Icon(Icons.refresh_rounded)),
+                  onPressed: () async {
+                    bool? confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("Konfirmasi"),
+                          content: const Text(
+                              "Apakah Anda yakin ingin reset hitungan?"),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text("Batal"),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text("Reset",
+                                  style: TextStyle(color: Colors.red)),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+
+                    if (confirm == true && context.mounted) {
+                      setState(() => _controller.resetCounter());
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Hitungan berhasil direset"),
+                          backgroundColor: Colors.blue,
+                          behavior: SnackBarBehavior.floating,
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  },
+                  icon: const Icon(Icons.refresh_rounded),
+                ),
               ],
             ),
             SizedBox(),
@@ -72,9 +108,13 @@ class _CounterViewState extends State<CounterView> {
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         ListTile(
-                          leading: Icon(Icons.history),
-                          title: Text(_controller.currentHistory[index]),
-                        )
+                            leading: Icon(Icons.history),
+                            title: Text(
+                              _controller.currentHistory[index],
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            tileColor: _controller
+                                .colorTile(_controller.currentHistory[index]))
                       ],
                     ),
                   );

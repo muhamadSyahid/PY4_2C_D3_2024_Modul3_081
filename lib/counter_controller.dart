@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart';
+
 class CounterController {
-  int _counter = 10;
+  int _counter = 0;
   int _step;
   final List<String> _history = [];
 
@@ -23,7 +25,7 @@ class CounterController {
   void resetCounter() {
     int before = _counter;
     _counter = 0;
-    _addLog("Mengurangi", before, _counter);
+    _addLog("Reset", before, _counter);
   }
 
   void setStep(int newStep) {
@@ -34,5 +36,17 @@ class CounterController {
     String time =
         "${DateTime.now().hour}:${DateTime.now().minute.toString().padLeft(2, '0')}";
     _history.insert(0, "User $action dari $from ke $to di jam $time");
+  }
+
+  Color colorTile(String text) {
+    Color result;
+    if (text.contains("Menambahkan")) {
+      result = Colors.green;
+    } else if (text.contains("Mengurangi")) {
+      result = Colors.red;
+    } else {
+      result = Colors.lightBlue;
+    }
+    return result;
   }
 }
