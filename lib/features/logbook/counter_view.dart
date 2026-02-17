@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'counter_controller.dart';
+import 'package:logbook_app_081/features/logbook/counter_controller.dart';
+import 'package:logbook_app_081/features/onboarding/onboarding_view.dart';
 
 class CounterView extends StatefulWidget {
-  const CounterView({super.key});
+  final String username;
+
+  const CounterView({super.key, required this.username});
 
   @override
   State<CounterView> createState() => _CounterViewState();
@@ -15,12 +18,44 @@ class _CounterViewState extends State<CounterView> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text("Logbook After SRP"),
+        title: Text("Logbook: ${widget.username}"),
+        actions: [
+          IconButton(onPressed: () {
+          showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Konfirmasi Logout"),
+          content: const Text("Apakah Anda yakin? Data yang belum disimpan mungkin akan hilang."),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Batal"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); 
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const OnboardingView()),
+                  (route) => false,
+                );
+              },
+              child: const Text("Ya, Keluar", style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  },
+  icon: const Icon(Icons.logout))],
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Text("Selamat datang ${widget.username}"),
+            const SizedBox(height: 10),
             const Text(
               'Total Hitungan',
             ),
