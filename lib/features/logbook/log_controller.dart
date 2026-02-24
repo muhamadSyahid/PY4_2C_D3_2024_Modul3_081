@@ -1,0 +1,61 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:logbook_app_081/features/logbook/models/log_model.dart';
+
+class LogController {
+  final ValueNotifier<List<LogModel>> logsNotifier = ValueNotifier([]);
+  static const String _storageKey = 'user_logs_data';
+
+  List<LogModel> getLogsByUser(String currentUser) {
+    return logsNotifier.value.where((log) => log.user == currentUser).toList();
+  }
+
+  LogController() {
+    loadFromDisk();
+  }
+
+  void addLog(String user, String title, String desc) {
+    final newLog = LogModel(
+        user: user,
+        title: title,
+        description: desc,
+        date: DateTime.now().toString());
+    logsNotifier.value = [...logsNotifier.value, newLog];
+    saveToDisk();
+  }
+
+  void updateLog(int index, String user, String title, String desc) {
+    final currentLogs = List<LogModel>.from(logsNotifier.value);
+    currentLogs[index] = LogModel(
+        user: user,
+        title: title,
+        description: desc,
+        date: DateTime.now().toString());
+    logsNotifier.value = currentLogs;
+    saveToDisk();
+  }
+
+  void removeLog(int index) {
+    final currentLogs = List<LogModel>.from(logsNotifier.value);
+    currentLogs.removeAt(index);
+    logsNotifier.value = currentLogs;
+    saveToDisk();
+  }
+
+  Future<void> saveToDisk() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String encodedData =
+        jsonEncode(logsNotifier.value.map((e) => e.toMap()).toList());
+    await prefs.setString(_storageKey, encodedData);
+  }
+
+  Future<void> loadFromDisk() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? data = prefs.getString(_storageKey);
+    if (data != null) {
+      final List decoded = jsonDecode(data);
+      logsNotifier.value = decoded.map((e) => LogModel.fromMap(e)).toList();
+    }
+  }
+}

@@ -7,13 +7,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   bool isDone = prefs.getBool('is_onboarding_done') ?? false;
-  runApp(MaterialApp(
-    home: isDone ? const LoginView() : const OnboardingView(),
-  ));
+  runApp(MyApp(isDone: isDone));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isDone;
+  const MyApp({super.key, required this.isDone});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +22,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const OnboardingView(),
+      home: isDone ? const LoginView() : const OnboardingView(),
     );
   }
 }
