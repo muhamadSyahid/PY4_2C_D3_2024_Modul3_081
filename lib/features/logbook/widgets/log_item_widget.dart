@@ -16,13 +16,35 @@ class LogItemWidget extends StatelessWidget {
     required this.onEdit,
   });
 
+  Color _getCategoryColor(String category) {
+    switch (category) {
+      case 'Pekerjaan':
+        return Colors.blue.shade100;
+      case 'Urgent':
+        return Colors.red.shade100;
+      case 'Pribadi':
+      default:
+        return Colors.green.shade100;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: _getCategoryColor(log.category),
       child: ListTile(
         leading: const Icon(Icons.note),
-        title: Text('${log.title} By ${log.user}'),
-        subtitle: Text(log.description),
+        title: Text('${log.title} (${log.category})'),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(log.description),
+            Text(
+              'By ${log.user}',
+              style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+            ),
+          ],
+        ),
         trailing: Wrap(
           children: [
             IconButton(
