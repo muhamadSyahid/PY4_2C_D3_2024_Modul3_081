@@ -30,39 +30,67 @@ class LogItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: _getCategoryColor(log.category),
-      child: ListTile(
-        leading: const Icon(Icons.note),
-        title: Text('${log.title} (${log.category})'),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(log.description),
-            Text(
-              'By ${log.user}',
-              style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
-            ),
-          ],
-        ),
-        trailing: Wrap(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.edit, color: Colors.blue),
-              onPressed: () {
-                // Mencari index asli di list utama
-                final originalIndex = allLogs.indexOf(log);
-                onEdit(originalIndex, log);
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              onPressed: () {
-                // Menghapus berdasarkan index asli
-                controller.removeLog(allLogs.indexOf(log));
-              },
-            ),
-          ],
+    return Dismissible(
+      key: Key(log.date), // Menggunakan tanggal sebagai key unik
+      direction: DismissDirection.endToStart, // Hanya swipe dari kanan ke kiri
+      background: Container(
+        color: Colors.red,
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20),
+        child: const Icon(Icons.delete, color: Colors.white),
+      ),
+      confirmDismiss: (direction) async {
+        return await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("Konfirmasi Hapus"),
+              content:
+                  const Text("Apakah Anda yakin ingin menghapus catatan ini?"),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text("Batal")),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child:
+                      const Text("Hapus", style: TextStyle(color: Colors.red)),
+                ),
+              ],
+            );
+          },
+        );
+      },
+      onDismissed: (direction) {
+        controller.removeLog(allLogs.indexOf(log));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Catatan dihapus")),
+        );
+      },
+      child: Card(
+        color: _getCategoryColor(log.category),
+        child: ListTile(
+          leading: const Icon(Icons.note),
+          title: Text('${log.title} (${log.category})'),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(log.description),
+              Text(
+                'By ${log.user}',
+                style:
+                    const TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+              ),
+            ],
+          ),
+          trailing: IconButton(
+            icon: const Icon(Icons.edit, color: Colors.blue),
+            onPressed: () {
+              // Mencari index asli di list utama
+              final originalIndex = allLogs.indexOf(log);
+              onEdit(originalIndex, log);
+            },
+          ),
         ),
       ),
     );
