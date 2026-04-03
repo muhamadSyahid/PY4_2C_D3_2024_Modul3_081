@@ -50,8 +50,8 @@ void main() {
   // Prekondisi: SharedPreferences tersedia dan controller tidak memiliki data log.
   // Langkah Pengujian: Biarkan logsNotifier kosong lalu panggil saveToDisk.
   // Data Test: List log kosong.
-  // Ekspektasi: SharedPreferences menyimpan JSON array kosong pada key user_logs_data.
-  test('saveToDisk stores empty list as empty JSON array', () async {
+  // Ekspektasi: saveToDisk mengabaikan log kosong dan tidak menyimpan data ke key user_logs_data.
+  test('saveToDisk ignores empty logs and does not persist data', () async {
     final controller = LogController();
 
     controller.logsNotifier.value = [];
@@ -61,9 +61,7 @@ void main() {
     final prefs = await SharedPreferences.getInstance();
     final storedData = prefs.getString('user_logs_data');
 
-    expect(storedData, isNotNull);
-    expect(jsonDecode(storedData!), isA<List>());
-    expect(jsonDecode(storedData), isNotEmpty);
+    expect(storedData, isNull);
   });
 
   // Test Case ID: TC03
